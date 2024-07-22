@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 import { FaRegStar, FaStar } from 'react-icons/fa';
+import { useIpAddress } from '../hooks/useIpAddress';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,14 +14,18 @@ const supabase = createClient(
 
 export default function RatingPage({ params }: { params: { shortCode: string } }) {
   const [business, setBusiness] = useState<any>(null);
+  const [shortUrlId, setShortUrlId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState<number | null>(null);
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email') || '';
+  const phone = searchParams.get('phone') || '';
+  const ipAddress = useIpAddress();
 
   useEffect(() => {
-    const fetchBusiness = async () => {
+    const fetchBusinessAndShortUrlId = async () => {
       try {
         const { data, error } = await supabase
           .from('short_urls')
@@ -42,43 +47,45 @@ export default function RatingPage({ params }: { params: { shortCode: string } }
 
         if (error) throw error;
         setBusiness(data);
-        // Record analytics
-        await supabase
-          .from('analytics')
-          .upsert({ short_url_id: data.id, clicks: 1, unique_visitors: 1 }, { onConflict: 'short_url_id' });
+        setShortUrlId(data.id);
       } catch (err) {
-        setError('Business not found');
+        console.error('Error fetching business:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchBusiness();
+    fetchBusinessAndShortUrlId();
   }, [params.shortCode]);
 
   const handleRating = async (value: number) => {
     setRating(value);
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('customer_feedback')
-      .insert({ business_id: business.businesses.id, rating: value });
+      .insert({
+        business_id: business.businesses.id,
+        short_url_id: shortUrlId,
+        rating: value,
+        ip_address: ipAddress,
+        email: email,
+        phone: phone
+      })
+      .select()
+      .single();
 
-    if (!error) {
-      if (value <= 3) {
-        router.push(`/${params.shortCode}/feedback?rating=${value}`);
-      } else {
-        router.push(`/${params.shortCode}/review?rating=${value}`);
-      }
+    if (error) {
+      console.error('Error recording rating:', error);
+      return;
+    }
+
+    if (value <= 3) {
+      router.push(`/${params.shortCode}/feedback?id=${data.id}`);
+    } else {
+      router.push(`/${params.shortCode}/review?id=${data.id}`);
     }
   };
 
   if (loading) return <div className="flex justify-center items-center h-screen">
     <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-  </div>;
-
-  if (error) return <div className="flex justify-center items-center h-screen">
-    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-      <strong className="font-bold">Error!</strong>
-      <span className="block sm:inline"> {error}</span>
-    </div>
   </div>;
 
   if (!business) return <div className="flex justify-center items-center h-screen">

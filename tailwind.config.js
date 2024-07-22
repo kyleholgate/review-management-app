@@ -10,7 +10,13 @@ module.exports = {
         'opacity-100',
     ],
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                'star-gold': '#e6c200',
+            },
+        },
     },
-    plugins: [],
+    plugins: [
+        require('@tailwindcss/forms'),
+    ],
 }

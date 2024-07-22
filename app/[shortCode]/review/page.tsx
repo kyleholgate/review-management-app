@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { FaGoogle, FaFacebook, FaYelp, FaCheck } from 'react-icons/fa';
+import { useIpAddress } from '../../hooks/useIpAddress';
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -11,40 +12,60 @@ const supabase = createClient(
 );
 
 export default function ReviewPage({ params }: { params: { shortCode: string } }) {
-    const searchParams = useSearchParams();
-    const rating = parseInt(searchParams.get('rating') || '4');
     const [business, setBusiness] = useState<any>(null);
+    const [shortUrlId, setShortUrlId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [clickedButtons, setClickedButtons] = useState<{ [key: string]: boolean }>({});
+    const searchParams = useSearchParams();
+    const feedbackId = searchParams.get('id');
+    const ipAddress = useIpAddress();
 
     useEffect(() => {
-        const fetchBusiness = async () => {
+        const fetchBusinessAndShortUrlId = async () => {
             const { data, error } = await supabase
                 .from('short_urls')
                 .select(`
-          businesses (
-            id,
-            name,
-            google_maps_url,
-            facebook_url,
-            yelp_url
-          )
-        `)
+                    id,
+                    businesses (
+                        id,
+                        name,
+                        google_maps_url,
+                        facebook_url,
+                        yelp_url
+                    )
+                `)
                 .eq('short_code', params.shortCode)
                 .single();
 
             if (!error && data) {
                 setBusiness(data.businesses);
+                setShortUrlId(data.id);
             }
             setLoading(false);
         };
 
-        fetchBusiness();
+        fetchBusinessAndShortUrlId();
     }, [params.shortCode]);
 
-    const handleButtonClick = (platform: string, url: string) => {
+    const handleButtonClick = async (platform: string, url: string) => {
         window.open(url, '_blank');
         setClickedButtons(prev => ({ ...prev, [platform]: true }));
+
+        // Log the click to the analytics table
+        const { error } = await supabase
+            .from('analytics')
+            .insert({
+                business_id: business.id,
+                short_url_id: shortUrlId,
+                customer_feedback_id: feedbackId,
+                platform: platform,
+                ip_address: ipAddress,
+                clicks: 1
+            });
+
+        if (error) {
+            console.error('Error logging review click:', error);
+        }
     };
 
     const getButtonClass = (platform: string) => {
@@ -71,52 +92,42 @@ export default function ReviewPage({ params }: { params: { shortCode: string } }
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
             <div className="bg-white shadow-lg rounded-lg p-8 max-w-2xl w-full">
-                <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">
-                    {rating >= 4 ? "Let Your Neighbors Know!" : "Thank You for Your Feedback"}
-                </h1>
+                <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Let Your Neighbors Know!</h1>
                 <p className="text-center text-gray-600 mb-6 text-lg">
-                    {rating === 5
-                        ? <>We're so happy we were able to give you <span className="font-bold">5-star service</span>!</>
-                        : rating === 4
-                            ? "We're so happy we were able to give you excellent service!"
-                            : `We value your feedback and will use it to improve our services. Thank you for taking the time to share your thoughts with us.`
-                    }
-                    {rating >= 4 && " By sharing your experience on one of these platforms, you can help us continue to grow and serve the community."}
+                    By sharing your experience on one of these platforms, you can help us continue to grow and serve the community.
                 </p>
-                {rating >= 4 && (
-                    <div className="flex flex-col space-y-4">
-                        {business.google_maps_url && (
-                            <button
-                                onClick={() => handleButtonClick('google', business.google_maps_url)}
-                                className={getButtonClass('google')}
-                            >
-                                <FaGoogle className="mr-2" />
-                                Review on Google
-                                <FaCheck className={`absolute right-4 transition-opacity duration-300 ease-in-out ${clickedButtons['google'] ? 'opacity-100' : 'opacity-0'}`} />
-                            </button>
-                        )}
-                        {business.facebook_url && (
-                            <button
-                                onClick={() => handleButtonClick('facebook', business.facebook_url)}
-                                className={getButtonClass('facebook')}
-                            >
-                                <FaFacebook className="mr-2" />
-                                Review on Facebook
-                                <FaCheck className={`absolute right-4 transition-opacity duration-300 ease-in-out ${clickedButtons['facebook'] ? 'opacity-100' : 'opacity-0'}`} />
-                            </button>
-                        )}
-                        {business.yelp_url && (
-                            <button
-                                onClick={() => handleButtonClick('yelp', business.yelp_url)}
-                                className={getButtonClass('yelp')}
-                            >
-                                <FaYelp className="mr-2" />
-                                Review on Yelp
-                                <FaCheck className={`absolute right-4 transition-opacity duration-300 ease-in-out ${clickedButtons['yelp'] ? 'opacity-100' : 'opacity-0'}`} />
-                            </button>
-                        )}
-                    </div>
-                )}
+                <div className="flex flex-col space-y-4">
+                    {business.google_maps_url && (
+                        <button
+                            onClick={() => handleButtonClick('google', business.google_maps_url)}
+                            className={getButtonClass('google')}
+                        >
+                            <FaGoogle className="mr-2" />
+                            Review on Google
+                            <FaCheck className={`absolute right-4 transition-opacity duration-300 ease-in-out ${clickedButtons['google'] ? 'opacity-100' : 'opacity-0'}`} />
+                        </button>
+                    )}
+                    {business.facebook_url && (
+                        <button
+                            onClick={() => handleButtonClick('facebook', business.facebook_url)}
+                            className={getButtonClass('facebook')}
+                        >
+                            <FaFacebook className="mr-2" />
+                            Review on Facebook
+                            <FaCheck className={`absolute right-4 transition-opacity duration-300 ease-in-out ${clickedButtons['facebook'] ? 'opacity-100' : 'opacity-0'}`} />
+                        </button>
+                    )}
+                    {business.yelp_url && (
+                        <button
+                            onClick={() => handleButtonClick('yelp', business.yelp_url)}
+                            className={getButtonClass('yelp')}
+                        >
+                            <FaYelp className="mr-2" />
+                            Review on Yelp
+                            <FaCheck className={`absolute right-4 transition-opacity duration-300 ease-in-out ${clickedButtons['yelp'] ? 'opacity-100' : 'opacity-0'}`} />
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );
