@@ -1,0 +1,90 @@
+Review Management App Requirements Document
+Overview
+This web application is designed to help businesses collect customer reviews and manage their online reputation. The app generates unique short URLs and QR codes for businesses, which customers can use to leave ratings and reviews. Depending on the rating, customers are either asked for feedback or directed to leave reviews on popular platforms like Google Maps, Facebook, or Yelp.
+The app will be developed in two phases:
+
+Core functionality without user authentication or paid subscriptions
+Addition of user authentication and paid subscription features
+
+Phase 1 Requirements
+1. Technology Stack
+
+Frontend: NextJS, React, TypeScript
+Backend: NextJS API routes, NextJS App Router, TypeScript
+Database: Supabase
+Deployment: Vercel
+
+2. Database Schema
+mermaidCopyerDiagram
+    Business {
+        uuid id
+        string name
+        string google_maps_url
+        string facebook_url
+        string yelp_url
+    }
+    ShortURL {
+        uuid id
+        uuid business_id
+        string short_code
+        string qr_code_url
+    }
+    CustomerFeedback {
+        uuid id
+        uuid business_id
+        int rating
+        string feedback
+        timestamp created_at
+    }
+    Analytics {
+        uuid id
+        uuid business_id
+        uuid short_url_id
+        int clicks
+        int unique_visitors
+    }
+    Business ||--o{ ShortURL : has
+    Business ||--o{ CustomerFeedback : receives
+    Business ||--o{ Analytics : tracks
+    ShortURL ||--o{ Analytics : generates
+3. Core Features
+a. Short URL and QR Code Generation
+
+Generate unique short codes for each business
+Create QR codes linking to the rating page
+Store short URLs and QR codes in the database
+
+b. Customer Rating Flow
+
+Create a page for customers to rate businesses (1-5 stars)
+For 1-3 star ratings: Show a feedback form and store responses
+For 4-5 star ratings: Display buttons linking to review pages (Google Maps, Facebook, Yelp)
+
+c. Analytics Tracking
+
+Track clicks and unique visitors for each short URL
+Store analytics data in the database
+
+d. Backend Management
+
+Provide SQL scripts for manually adding businesses to the database
+
+4. API Endpoints
+
+POST /api/ratings: Submit a rating for a business
+POST /api/feedback: Submit feedback for a low rating
+GET /api/business/:shortCode: Retrieve business information by short code
+POST /api/analytics: Record a click or unique visitor
+
+5. Frontend Pages
+
+/:shortCode: Rating page for customers
+/:shortCode/feedback: Feedback form for low ratings
+/:shortCode/review: Page with links to review sites for high ratings
+
+6. Security Measures
+
+Implement rate limiting on API routes
+Sanitize user inputs to prevent XSS attacks
+Validate all incoming data
+
