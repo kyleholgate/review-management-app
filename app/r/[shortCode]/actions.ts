@@ -2,7 +2,7 @@
 
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { Database } from '../types/database'; // Adjust the path as needed
+import { Database } from '../../types/database';
 
 type Business = Database['public']['Tables']['businesses']['Row'];
 type ShortUrl = Database['public']['Tables']['short_urls']['Row'];
