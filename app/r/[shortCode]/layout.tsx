@@ -24,5 +24,8 @@ export default async function ShortCodeLayout({
 
 export async function generateMetadata({ params }: { params: { shortCode: string } }) {
     const data: ShortUrlQueryResult = await getBusinessData(params.shortCode);
-    return { title: data.businesses?.name || 'Business Rating' };
+    return {
+        title: data.businesses?.name + ' - Leave a Review' || 'Leave a Review',
+        description: 'Help ' + data.businesses?.name + ' by giving your feedback!' || 'Leave a Review',
+    };
 }
