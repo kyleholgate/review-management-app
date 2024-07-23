@@ -1,8 +1,8 @@
 import NodeCache from 'node-cache';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { Database } from '../../types/database';
-import { ShortUrlQueryResult } from '../../types/supabase';
+import { Database } from '../../../types/database';
+import { ShortUrlQueryResult } from '../../../types/supabase';
 
 
 const cache = new NodeCache({ stdTTL: 60 * 10 });

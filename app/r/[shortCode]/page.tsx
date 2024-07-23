@@ -1,7 +1,7 @@
 import { getBusinessData } from './utils/getBusinessData';
 import Image from 'next/image';
 import RatingClient from './RatingClient';
-import { ShortUrlQueryResult } from '../types/supabase';
+import { ShortUrlQueryResult } from '../../types/supabase';
 
 export default async function RatingPage({ params }: { params: { shortCode: string } }) {
     const data: ShortUrlQueryResult = await getBusinessData(params.shortCode);

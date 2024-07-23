@@ -1,6 +1,6 @@
 import { getBusinessData } from './utils/getBusinessData';
 import { FeedbackProvider } from '../context/FeedbackContext';
-import { ShortUrlQueryResult } from '../types/supabase';
+import { ShortUrlQueryResult } from '../../types/supabase';
 
 export default async function ShortCodeLayout({
     children,

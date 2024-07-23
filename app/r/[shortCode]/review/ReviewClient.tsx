@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { FaGoogle, FaFacebook, FaYelp, FaCheck } from 'react-icons/fa';
-import { useIpAddress } from '../../r/hooks/useIpAddress';
+import { useIpAddress } from '../../hooks/useIpAddress';
 import { logReviewClick } from './actions';
-import { useFeedback } from '../../r/context/FeedbackContext';
-import { Business, ShortUrl } from '../../types/supabase';
+import { useFeedback } from '../../context/FeedbackContext';
+import { Business, ShortUrl } from '../../../types/supabase';
 
 interface ReviewClientProps {
     business: Business;

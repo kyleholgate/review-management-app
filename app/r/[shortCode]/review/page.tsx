@@ -1,6 +1,6 @@
 import { getBusinessData } from '../utils/getBusinessData';
 import ReviewClient from './ReviewClient';
-import { ShortUrlQueryResult } from '../../types/supabase';
+import { ShortUrlQueryResult } from '../../../types/supabase';
 
 export default async function ReviewPage({ params }: { params: { shortCode: string } }) {
     const data: ShortUrlQueryResult = await getBusinessData(params.shortCode);

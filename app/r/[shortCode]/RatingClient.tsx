@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaRegStar, FaStar } from 'react-icons/fa';
-import { useFeedback } from '../r/context/FeedbackContext';
+import { useFeedback } from '../context/FeedbackContext';
 import { submitRating } from './actions'; // Import the server action
-import { useIpAddress } from '../r/hooks/useIpAddress'; // Assuming you have this hook
+import { useIpAddress } from '../hooks/useIpAddress'; // Assuming you have this hook
 
 interface RatingClientProps {
     businessId: string;
@@ -25,9 +25,9 @@ export default function RatingClient({ businessId, shortUrlId, shortCode }: Rati
             setFeedbackId(feedbackId);
             console.log('Set feedbackId to:', feedbackId);
             if (value <= 3) {
-                router.push(`/${shortCode}/feedback`);
+                router.push(`/r/${shortCode}/feedback`);
             } else {
-                router.push(`/${shortCode}/review`);
+                router.push(`/r/${shortCode}/review`);
             }
         } catch (error) {
             console.error('Error submitting rating:', error);
