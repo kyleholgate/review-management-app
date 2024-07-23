@@ -22,7 +22,7 @@ export default async function RatingPage({ params }: { params: { shortCode: stri
                         alt={`${business.name} logo`}
                         width={200}
                         height={200}
-                        className="rounded-full max-w-[200px] w-full h-auto"
+                        className="max-w-[200px] w-full h-auto"
                     />
                 </div>
                 <p className="text-center text-gray-600 mb-4">How would you rate your service?</p>

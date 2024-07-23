@@ -12,9 +12,15 @@ export default async function ReviewPage({ params }: { params: { shortCode: stri
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
             <div className="bg-white shadow-lg rounded-lg p-8 max-w-2xl w-full">
-                <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Let Your Neighbors Know!</h1>
+                <h1 className="text-4xl font-bold mb-6 text-center text-gray-800">Can You Help Us?</h1>
                 <p className="text-center text-gray-600 mb-6 text-lg">
-                    By sharing your experience on one of these platforms, you can help us continue to grow and serve the community.
+                    We're so proud we were able to give you great service!
+                </p>
+                <p className="text-center text-gray-600 mb-6 text-lg">
+                    As a local small business, we rely on the support of customers like you to keep us around. Your voice matters in helping other homeowners find us.
+                </p>
+                <p className="text-center text-gray-600 mb-6 text-lg font-bold">
+                    Can you please take a moment to share your experience with us below?
                 </p>
                 <ReviewClient business={data.businesses} shortUrlId={data.id} />
             </div>
