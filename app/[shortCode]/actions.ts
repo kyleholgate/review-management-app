@@ -2,9 +2,20 @@
 
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { Database } from '../types/database'; // Adjust the path as needed
 
-export async function submitRating(businessId: number, shortUrlId: number, rating: number, ipAddress: string, email: string, phone: string) {
-    const supabase = createServerComponentClient({ cookies });
+type Business = Database['public']['Tables']['businesses']['Row'];
+type ShortUrl = Database['public']['Tables']['short_urls']['Row'];
+
+export async function submitRating(
+    businessId: Business['id'],
+    shortUrlId: ShortUrl['id'],
+    rating: number,
+    ipAddress: string,
+    email: string,
+    phone: string
+): Promise<string> {
+    const supabase = createServerComponentClient<Database>({ cookies });
 
     const { data, error } = await supabase
         .from('customer_feedback')

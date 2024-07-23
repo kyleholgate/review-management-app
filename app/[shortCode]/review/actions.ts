@@ -2,9 +2,16 @@
 
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import { Database } from '../../types/database' // Adjust the path as needed
 
-export async function logReviewClick(businessId: string, shortUrlId: string, feedbackId: string | null, platform: string, ipAddress: string) {
-    const supabase = createServerActionClient({ cookies })
+export async function logReviewClick(
+    businessId: string,
+    shortUrlId: string,
+    feedbackId: string | null,
+    platform: string,
+    ipAddress: string
+) {
+    const supabase = createServerActionClient<Database>({ cookies })
 
     const { error } = await supabase
         .from('analytics')

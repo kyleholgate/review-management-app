@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useFeedback } from '../../context/FeedbackContext';
 import { submitFeedback } from './actions';
 
 export default function FeedbackForm() {
@@ -10,8 +10,7 @@ export default function FeedbackForm() {
     const [phone, setPhone] = useState('');
     const [feedback, setFeedback] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const searchParams = useSearchParams();
-    const feedbackId = searchParams.get('id');
+    const { feedbackId } = useFeedback();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

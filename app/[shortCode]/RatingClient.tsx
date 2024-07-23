@@ -1,32 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { FaRegStar, FaStar } from 'react-icons/fa';
-import { useIpAddress } from '../hooks/useIpAddress';
+import { useFeedback } from '../context/FeedbackContext';
+import { submitRating } from './actions'; // Import the server action
+import { useIpAddress } from '../hooks/useIpAddress'; // Assuming you have this hook
 
 interface RatingClientProps {
-    businessId: number;
-    shortUrlId: number;
+    businessId: string;
+    shortUrlId: string;
     shortCode: string;
-    submitRating: (businessId: number, shortUrlId: number, rating: number, ipAddress: string, email: string, phone: string) => Promise<number>;
 }
 
-export default function RatingClient({ businessId, shortUrlId, shortCode, submitRating }: RatingClientProps) {
+export default function RatingClient({ businessId, shortUrlId, shortCode }: RatingClientProps) {
     const [hoveredStar, setHoveredStar] = useState<number | null>(null);
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const email = searchParams.get('email') || '';
-    const phone = searchParams.get('phone') || '';
-    const ipAddress = useIpAddress();
+    const { setFeedbackId } = useFeedback();
+    const ipAddress = useIpAddress(); // Get the IP address
 
     const handleRating = async (value: number) => {
         try {
-            const feedbackId = await submitRating(businessId, shortUrlId, value, ipAddress, email, phone);
+            const feedbackId = await submitRating(businessId, shortUrlId, value, ipAddress, '', '');
+            setFeedbackId(feedbackId);
             if (value <= 3) {
-                router.push(`/${shortCode}/feedback?id=${feedbackId}`);
+                router.push(`/${shortCode}/feedback`);
             } else {
-                router.push(`/${shortCode}/review?id=${feedbackId}`);
+                router.push(`/${shortCode}/review`);
             }
         } catch (error) {
             console.error('Error submitting rating:', error);
@@ -45,13 +45,9 @@ export default function RatingClient({ businessId, shortUrlId, shortCode, submit
                     className="focus:outline-none transform transition-transform duration-200 hover:scale-110"
                 >
                     {hoveredStar && star <= hoveredStar ? (
-                        <FaStar
-                            className="h-10 w-10 sm:h-16 sm:w-16 transition-colors duration-200 text-star-gold"
-                        />
+                        <FaStar className="h-10 w-10 sm:h-16 sm:w-16 transition-colors duration-200 text-star-gold" />
                     ) : (
-                        <FaRegStar
-                            className="h-10 w-10 sm:h-16 sm:w-16 transition-colors duration-200 text-star-gold"
-                        />
+                        <FaRegStar className="h-10 w-10 sm:h-16 sm:w-16 transition-colors duration-200 text-star-gold" />
                     )}
                 </button>
             ))}

@@ -1,31 +1,13 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { getBusinessData } from '../utils/getBusinessData';
 import ReviewClient from './ReviewClient';
+import { ShortUrlQueryResult } from '../../types/supabase';
 
 export default async function ReviewPage({ params }: { params: { shortCode: string } }) {
-    const supabase = createServerComponentClient({ cookies });
+    const data: ShortUrlQueryResult = await getBusinessData(params.shortCode);
 
-    const { data, error } = await supabase
-        .from('short_urls')
-        .select(`
-      id,
-      businesses (
-        id,
-        name,
-        google_maps_url,
-        facebook_url,
-        yelp_url
-      )
-    `)
-        .eq('short_code', params.shortCode)
-        .single();
-
-    if (error) {
-        console.error('Error fetching business:', error);
-        return <div className="flex justify-center items-center h-screen">Business not found</div>;
+    if (!data || !data.businesses) {
+        return <div>No business found for this URL</div>;
     }
-
-    const { businesses: business, id: shortUrlId } = data;
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -34,7 +16,7 @@ export default async function ReviewPage({ params }: { params: { shortCode: stri
                 <p className="text-center text-gray-600 mb-6 text-lg">
                     By sharing your experience on one of these platforms, you can help us continue to grow and serve the community.
                 </p>
-                <ReviewClient business={business} shortUrlId={shortUrlId} />
+                <ReviewClient business={data.businesses} shortUrlId={data.id} />
             </div>
         </div>
     );

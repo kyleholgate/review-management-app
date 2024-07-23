@@ -1,23 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { FaGoogle, FaFacebook, FaYelp, FaCheck } from 'react-icons/fa';
 import { useIpAddress } from '../../hooks/useIpAddress';
 import { logReviewClick } from './actions';
+import { useFeedback } from '../../context/FeedbackContext';
+import { Business, ShortUrl } from '../../types/supabase';
 
-export default function ReviewClient({ business, shortUrlId }: { business: any, shortUrlId: string }) {
+interface ReviewClientProps {
+    business: Business;
+    shortUrlId: ShortUrl['id'];
+}
+
+export default function ReviewClient({ business, shortUrlId }: ReviewClientProps) {
     const [clickedButtons, setClickedButtons] = useState<{ [key: string]: boolean }>({});
-    const searchParams = useSearchParams();
-    const feedbackId = searchParams.get('id');
     const ipAddress = useIpAddress();
+    const { feedbackId } = useFeedback();
 
-    const handleButtonClick = async (platform: string, url: string) => {
+    const handleButtonClick = async (platform: string, url: string | null) => {
+        if (!url) return;
+
         window.open(url, '_blank');
         setClickedButtons(prev => ({ ...prev, [platform]: true }));
 
         try {
-            await logReviewClick(business.id, shortUrlId, feedbackId, platform, ipAddress);
+            await logReviewClick(business.id, shortUrlId, feedbackId || '', platform, ipAddress);
         } catch (error) {
             console.error('Error logging review click:', error);
         }
