@@ -11,6 +11,7 @@ export default function FeedbackForm() {
     const [feedback, setFeedback] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
     const { feedbackId } = useFeedback();
+    console.log('feedbackId:', feedbackId);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

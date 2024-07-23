@@ -23,6 +23,7 @@ export default function RatingClient({ businessId, shortUrlId, shortCode }: Rati
         try {
             const feedbackId = await submitRating(businessId, shortUrlId, value, ipAddress, '', '');
             setFeedbackId(feedbackId);
+            console.log('Set feedbackId to:', feedbackId);
             if (value <= 3) {
                 router.push(`/${shortCode}/feedback`);
             } else {
