@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Review Management App
+
+A Next.js application designed to help businesses collect and manage customer reviews efficiently. The app generates unique short URLs and QR codes that businesses can share with customers to gather ratings and reviews.
+
+## Features
+
+- Generate unique short URLs and QR codes for businesses
+- Collect customer ratings (1-5 stars)
+- Smart review routing:
+  - 1-3 stars: Collect private feedback
+  - 4-5 stars: Direct to public review platforms (Google Maps, Facebook, Yelp)
+- Analytics tracking for URL clicks and unique visitors
+- Built with modern tech stack: Next.js, TypeScript, Tailwind CSS, and Supabase
+
+## Tech Stack
+
+- Frontend: Next.js 14, React 18, TypeScript
+- Styling: Tailwind CSS
+- Database: Supabase
+- Authentication: Supabase Auth
+- QR Code Generation: qrcode
+- Icons: react-icons
+- Forms: @tailwindcss/forms
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+3. Set up your environment variables:
+   Create a `.env.local` file with your Supabase credentials:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Project Structure
 
-## Learn More
+- `/app` - Next.js 14 app directory containing all routes and pages
+- `/public` - Static assets
+- `/supabase` - Supabase configuration and types
+- `/scripts` - Utility scripts
 
-To learn more about Next.js, take a look at the following resources:
+## Database Schema
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The application uses the following main tables:
+- Business: Stores business information and review platform URLs
+- ShortURL: Manages generated short URLs and QR codes
+- CustomerFeedback: Stores customer ratings and feedback
+- Analytics: Tracks usage statistics
